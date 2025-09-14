@@ -140,12 +140,12 @@ export default function TheData() {
                     <p className="text-slate-400 text-sm">
                       <strong>Data Source:</strong>{" "}
                       <a
-                        href="https://www.universityofcalifornia.edu/about-us/information-center/transfers-major"
+                        href="https://github.com/BryanQTNguyen/LighthouseAI/blob/main/README.md"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline">
 
-                        University of California Transfers by major
+                        Github ReadME
                       </a>
                     </p>
                     <p className="text-blue-400 text-sm mt-2">
@@ -194,12 +194,12 @@ export default function TheData() {
                     <p className="text-slate-400 text-sm">
                       <strong>Data Source:</strong>{" "}
                       <a
-                        href="https://ncses.nsf.gov/pubs/nsb20231"
+                        href="https://github.com/BryanQTNguyen/LighthouseAI/blob/main/README.md"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline">
 
-                        National Science Foundation, Science and Engineering Indicators 2023
+                        Github ReadMe
                       </a>
                     </p>
                     <p className="text-blue-400 text-sm mt-2">
@@ -312,12 +312,12 @@ export default function TheData() {
                     <p className="text-slate-400 text-sm">
                       <strong>Data Source:</strong>{" "}
                       <a
-                        href="https://www.bls.gov/emp/tables/employment-projections.htm"
+                        href="https://github.com/BryanQTNguyen/LighthouseAI/blob/main/README.md"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline">
 
-                        U.S. Bureau of Labor Statistics, Employment Projections 2022-2032
+                        Github ReadMe
                       </a>
                     </p>
                     <p className="text-blue-400 text-sm mt-2">
