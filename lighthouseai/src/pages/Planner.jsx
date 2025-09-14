@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect } from "react";
-import { StudentProfile, Roadmap, User } from "@/api/entities";
-import { InvokeLLM } from "@/api/integrations";
+import React, { useState } from "react";
+import { StudentProfile, Roadmap } from "@/entities/all";
+import { InvokeLLM } from "@/integrations/Core";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 
@@ -14,31 +13,15 @@ export default function Planner() {
     education_level: "",
     intended_major: "",
     career_goals: "",
-    experience: "", // Added to profileData state
-    motivation: "",  // Added to profileData state
+    experience: "",
+    motivation: "",
     constraints: {
       financial_needs: "",
-      location_preference: "",
       time_availability: ""
     },
-    background: ""
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedRoadmap, setGeneratedRoadmap] = useState(null);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const loadUser = async () => {
-    try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-    } catch (error) {
-      console.error("User not authenticated");
-    }
-  };
 
   // Asking the users questions to guage what their pathway can be
   const questions = [
@@ -70,7 +53,7 @@ export default function Planner() {
       id: "experience",
       title: "What STEM-related experiences have you already had?",
       type: "textarea",
-      placeholder: "e.g., Internships, Research, Portfolio cooking"
+      placeholder: "e.g., Internships, Research, Portfolio projects"
     },
     {
       id: "motivation",
@@ -94,17 +77,6 @@ export default function Planner() {
           ]
         },
         {
-          id: "location_preference",
-          label: "Location preference",
-          type: "select",
-          options: [
-            { value: "local", label: "Local opportunities only" },
-            { value: "regional", label: "Within my region" },
-            { value: "national", label: "Anywhere in the country" },
-            { value: "remote", label: "Remote/Online preferred" }
-          ]
-        },
-        {
           id: "time_availability",
           label: "Time commitment",
           type: "select",
@@ -116,12 +88,6 @@ export default function Planner() {
         }
       ]
     },
-    {
-      id: "background",
-      title: "Anything else about your background?",
-      type: "textarea",
-      placeholder: "Share any other relevant details about your background, interests, or challenges you're facing..."
-    }
   ];
 
   const handleInputChange = (field, value) => {
@@ -153,7 +119,7 @@ export default function Planner() {
       });
 
       // Create AI prompt focused on big picture guidance
-      const prompt = `Create a high-level, strategic STEM roadmap for a student with the following profile:
+      const prompt = `Create a concise, high-level, strategic STEM roadmap for a student with the following profile:
 
 Education Level: ${profileData.education_level}
 Intended Major/Field: ${profileData.intended_major}
@@ -161,39 +127,26 @@ Career Goals: ${profileData.career_goals}
 Experience: ${profileData.experience || "Not specified"}
 Motivation: ${profileData.motivation || "Not specified"}
 Financial Needs: ${profileData.constraints.financial_needs}
-Location Preference: ${profileData.constraints.location_preference}
 Time Availability: ${profileData.constraints.time_availability}
-Background: ${profileData.background}
 
 CRITICAL: The roadmap MUST END with the student achieving their stated goal: "${profileData.career_goals}"
 
 IMPORTANT GUIDANCE FOR ROADMAP CREATION:
-- Focus on BIG PICTURE strategic milestones, NOT specific courses
-- Provide broad strokes that let the student fill in details
-- Think in terms of "phases" or "focus areas" rather than exact classes
-- The FINAL period should show them actually reaching their goal
-- Examples of good big-picture guidance:
-  * "Build foundational knowledge in core CS concepts"
-  * "Begin networking and exploring internship opportunities" 
-  * "Develop practical experience through projects and labs"
-  * "Prepare for industry transition with portfolio development"
+- Focus on BIG PICTURE strategic milestones, NOT specific courses.
+- Milestone descriptions should be brief (1-2 sentences maximum).
 
 AVOID:
-- Specific course names (like "CS 101" or "Calculus II")
-- Detailed curriculum requirements
-- Overly prescriptive step-by-step instructions
+- Specific course names (like "CS 101").
+- Detailed curriculum requirements.
 
-CREATE:
-- 4-6 time periods (semesters, years, or phases)
-- 3-4 strategic milestones per period
-- Focus on skill development, networking, experience building, and career preparation
-- Include mix of: foundational learning, practical experience, networking, scholarship/funding, research (if applicable)
-- FINAL PERIOD: Must include achieving their stated goal as the culminating milestone
+CREATE A CONCISE ROADMAP:
+- 3-4 time periods (e.g., semesters, years, or phases).
+- 2-3 strategic milestones per period.
+- The FINAL PERIOD must include achieving their stated goal as the culminating milestone.
 
 The final milestone should be something like:
 - "Secure [specific type] internship position" 
 - "Transfer to 4-year university in [major]"
-- "Begin graduate program in [field]"
 - "Land entry-level position in [field]"
 - Whatever matches their specific stated goal: "${profileData.career_goals}"
 
@@ -201,15 +154,15 @@ Respond with valid JSON in this exact format:
 {
   "timeline": [
     {
-      "period": "Year 1 / Phase 1",
+      "period": "Phase 1: Foundation",
       "milestones": [
         {
           "title": "Build Core Foundation",
-          "description": "Focus on fundamental concepts in your field and develop strong study habits",
+          "description": "Focus on fundamental concepts in your field and develop strong study habits.",
           "type": "course",
           "effort_level": "medium",
           "priority": "high",
-          "resources": ["Academic advisors", "Study groups", "Online learning platforms"]
+          "resources": ["Academic advisors", "Study groups"]
         }
       ]
     }
@@ -275,7 +228,17 @@ Respond with valid JSON in this exact format:
 
     } catch (error) {
       console.error("Error generating roadmap:", error);
-      alert("Failed to generate roadmap. Please try again or contact support.");
+      
+      const errorMessage = error.message || error.toString();
+      console.error("Full error details:", errorMessage);
+      
+      if (errorMessage.includes('500')) {
+        alert("Our AI service is temporarily unavailable. Please try again in a few minutes.");
+      } else if (errorMessage.includes('API') || errorMessage.includes('integration')) {
+        alert("There was an issue with our AI service. Please check your inputs and try again.");
+      } else {
+        alert(`Failed to generate roadmap. Error: ${errorMessage.substring(0, 100)}... Please try again.`);
+      }
     }
     
     setIsGenerating(false);
@@ -302,12 +265,15 @@ Respond with valid JSON in this exact format:
         profileData.constraints[field.id] && profileData.constraints[field.id] !== ""
       );
     }
-    // Check for nested fields if present in the question ID (e.g., 'profileData.intended_major')
+    
     if (question.id.includes('.')) {
       const [parent, child] = question.id.split('.');
-      return profileData[parent] && profileData[parent][child] && profileData[parent][child] !== "";
+      const value = profileData[parent] && profileData[parent][child];
+      return value && value.trim().length > 0;
     }
-    return profileData[question.id] && profileData[question.id] !== "";
+    
+    const value = profileData[question.id];
+    return value && value.trim().length > 0;
   };
 
   if (generatedRoadmap) {

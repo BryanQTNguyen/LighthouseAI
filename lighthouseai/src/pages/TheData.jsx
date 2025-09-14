@@ -145,7 +145,7 @@ export default function TheData() {
                         rel="noopener noreferrer"
                         className="text-blue-400 hover:underline">
 
-                        Github ReadME
+                        Github ReadMe
                       </a>
                     </p>
                     <p className="text-blue-400 text-sm mt-2">
